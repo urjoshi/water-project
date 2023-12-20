@@ -1,0 +1,73 @@
+import math
+import pandas as pd
+import numpy as np
+
+# Initial values
+T0 = 4
+t0 = 0
+tn = 214
+h = 1
+
+t=t0
+def rungekutta4k(dT_dt, T0, t0,t,h):
+    t = t0
+    while t < tn:
+        k1 = dT_dt(t, T0)
+        k2 = dT_dt(t + h/2, T0 + k1*(h/2))
+        k3 = dT_dt(t + h/2, T0 + k2*(h/2))
+        k4 = dT_dt(t + h, T0 + k3*h)
+        T = T0 + h*(k1 + 2*k2 + 2*k3 + k4)/6
+        t1=t+1
+        #t0+=1
+        if t1>t:
+            break
+    return t, T
+
+def function(t,T):
+
+    #CONSTANTS
+    sigma= 11.7*10**(-8)           #Boltzmann constant
+    A= 0.6                         #Constant
+    Rl= 0.03                       #Reflection Coefficient
+    em= 0.97                       #emissivity
+    c1=0.47                        #Bowen's constant
+
+    #LAKE GEOMETRY
+    Density= 1000                     #Density
+    Volume= 12355375*np.power(10,6)   #Volume
+    As=10*(np.power(10,10))            #area
+    fUw= 19+0.95*(np.power(Uw,2))
+    dT_dt = (Jsn + (sigma * (np.power((Tair + 273),4)) * (A + 0.031*(np.sqrt(eair))) * (1 - Rl)) - (em * sigma * (np.power((T + 273),4))) - (c1 * fUw * (T - Tair)) - (fUw * (4.596 * np.exp((17.27*T)/(237.3+T)) - eair)))*(1.9388**(-8))
+    #print(dT_dt)
+    return dT_dt
+
+#IMPORTING DATA FROM EXCEL
+excel_data="/Users/urjoshi/Downloads/input data-minlake.xlsx"
+sheet=" data"
+df=pd.read_excel(excel_data,sheet)
+
+results=[]
+print(f"{'S.No.':<10}{'Time':<10}{'Temperature':<15}")
+#print(t0)
+for index, row in df.iterrows():
+        i = row['S.No.']
+        Tair = row['Air Temperature']
+        eair = row['Air pressure']
+        Jsn = row['Solar Radiation']
+        Uw = row['Wind Speed,cm']
+        final_t,final_T = rungekutta4k(function,T0, t0, t,h)
+        #print(f"after indexing{final_T}")
+        T0=final_T
+        t0+=h
+        results.append({'S.No.': i, 'Time': final_t, 'Temperature': final_T})
+        print(f"{i}{'':<8} {final_t:.2f}{'':<8} {final_T:.4f}")
+# Create DataFrame from results
+result_df = pd.DataFrame(results)
+
+# Save DataFrame to Excel
+excel_path = "/Users/urjoshi/Downloads/output7-data-minlake.xlsx"
+result_df.to_excel(excel_path, index=False)
+
+
+
+
