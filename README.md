@@ -49,11 +49,6 @@ S.No.      Time       Temperature
 ...
 ```
 
-## 🏗 Future Improvements
-- Enhance accuracy by tuning model coefficients.
-- Add data visualization for better analysis.
-- Implement additional numerical methods for comparison.
 
----
 🛠 Developed by **urjoshi** | 🌊 Numerical Modeling for Lake Temperature Simulation
 
